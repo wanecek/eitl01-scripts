@@ -1,0 +1,15 @@
+[Unit]
+Description=Monitor system CPU usage
+After=network.target
+StartLimitBurst=10
+StartLimitIntervalSec=20
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/usr/bin/env bash /root/sysstat-monitoring/manager.sh
+
+[Install]
+WantedBy=multi-user.target
