@@ -11,6 +11,7 @@ sudo apt-get install git \
   sysstat \
   man \
   curl \
+  gawk \
   gnupg \
   "linux-modules-extra-$(uname -r)" \
   vnstat
