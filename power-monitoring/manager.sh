@@ -4,6 +4,8 @@ set -eu
 
 components=$(find /sys/devices/virtual/powercap/intel-rapl -name "energy_uj")
 
+OUTPUT_DIR="$HOME/power-monitoring-db"
+
 read_energy() {
     local data=""
     for component in ${components[@]}; do
@@ -151,7 +153,7 @@ get_raw_energy() {
 
 ###############################
 
-print_header() {
+csv_header() {
     maxenergies=$(read_maxenergy)
 
     echo -n "timestamp;"
@@ -186,12 +188,12 @@ rand_delay() {
 
 write_entry() {
     local outfile;
-    outfile="$HOME/power-monitoring-db/$(generate_fname)"
+    outfile="$OUTPUT_DIR/$(generate_fname)"
 
-    if [[ ! -f $outfile ]]; then
-        header=$(print_header)
-        # We want to add timestamp to the predefined headers
-        echo "$header" > "$outfile"
+    # If it's the first time we write to the file, add a header,
+    # and in the same step create the file.
+    if [[ ! -f "$outfile" ]]; then
+        csv_header > "$outfile"
     fi
 
     entry="$(timestamp);$(print_energy)"
@@ -199,8 +201,8 @@ write_entry() {
 }
 
 main() {
-    if [[ ! -d "$HOME/power-monitoring-db" ]]; then
-        mkdir -p "$HOME/power-monitoring-db"
+    if [[ ! -d "$OUTPUT_DIR" ]]; then
+        mkdir -p "$OUTPUT_DIR"
     fi
 
     while true
