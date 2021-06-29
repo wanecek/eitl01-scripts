@@ -1,7 +1,11 @@
 # EITL01-scripts
 
-A collection of scripts and resources used in Bachelor's study on Stellar energy
-consumption in the spring of 2021.
+A collection of scripts and resources used in a Bachelor's study on Stellar
+energy consumption in the spring of 2021.
+
+For the final report, see [its page on Lund University
+Publications](http://lup.lub.lu.se/student-papers/record/9059429). There, you
+can read more about the methodology.
 
 The following scripts were used to monitor a Stellar Validator node, with the
 most important part being what is contained in
