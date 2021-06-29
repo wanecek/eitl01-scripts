@@ -14,6 +14,7 @@ most important part being what is contained in
 ## Directory Structure
 
 - `cfg` - Config files
+- `plots` - Scripts used for creating plots and tables. See subdir for README.
 - `power-monitoring` - systemd service for monitoring power consumption
 - `sysstat-montioring` - systemd service for monitoring system resource usage
 
