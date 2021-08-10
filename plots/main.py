@@ -351,6 +351,37 @@ def print_summary_table(rapl_df, network_df_raw, storage):
 
     print(header + body)
 
+def print_total_power_table(rapl_df, network_df_raw, pue, nodes, storage):
+    network_df = gbToW(network_df_raw * 1e-9, 24)
+    network_avg = (network_df["rx"] + network_df["tx"]) / 2
+
+    rq = rapl_df.quantile([0.1, 0.9]) * pue
+    nq = network_avg.quantile([0.1, 0.9])
+    rmu = rapl_df.mean() * pue
+    nmu = network_avg.mean()
+    total = {
+        "q10":  pue * (rq.at[0.1, "CPU"] + rq.at[0.1, "RAM"] + storage) + nq.at[0.1],
+        "mean": pue * (rmu["CPU"] + rmu["RAM"]) + nmu + 6.5,
+        "q90":  pue * (rq.at[0.9, "CPU"] + rq.at[0.9, "RAM"] + storage) + nq.at[0.9],
+    }
+
+    create_tuple = lambda x: (x, x * nodes / 1000)
+
+    cols = [" " * 14, "Power per node", "Total power"]
+    rows = [
+        "10~\\%% quantile & %.3f W & %.3f kW"
+        % create_tuple(total["q10"]),
+        "Mean           & %.3f W & %.3f kW"
+        % create_tuple(total["mean"]),
+        "90~\\%% quantile & %.3f W & %.3f kW"
+        % create_tuple(total["q90"]),
+    ]
+
+    header = " & ".join(cols) + "\\\\\\toprule\n"
+    body = "\\\\\n".join(rows) + "\\\\\\bottomrule\n"
+
+    print(header + body)
+
 
 def patched_network_data(network_d_df, network_t_df):
     network_d_df = network_d_df.loc["2021-05-23":"2021-05-25"] / 24
@@ -407,6 +438,13 @@ if __name__ == "__main__":
     # Printing rapl table
     print_rapl_table(rapl_readings.copy())
     print_summary_table(rapl_readings.copy(), network_traffic_readings.copy(), 6.5)
+
+    print_total_power_table(
+        rapl_df=rapl_readings.copy(),
+        network_df_raw=network_traffic_readings.copy(),
+        pue=1.67,
+        nodes=132,
+        storage=6.5)
 
     plot_cpu_vs_ops(rapl_readings.copy(), ledger_readings.copy(), pue, output_dir)
     plot_power_per_transaction(
