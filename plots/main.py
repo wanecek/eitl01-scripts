@@ -142,9 +142,7 @@ def plot_rapl_with_others(rapl_df, sysstat_df, activity_df, network_df, output_d
     fig.savefig(os.path.join(output_dir, "rapl-vs-sysstat.pdf"))
 
 
-def plot_cpu_vs_ops(rapl_df, activity_df, output_dir):
-    pue = 1.67
-
+def plot_cpu_vs_ops(rapl_df, activity_df, pue, output_dir):
     fig, ax = plt.subplots()
     # fig.figsize = (4, 6)
     fig.tight_layout(h_pad=3)
@@ -202,9 +200,7 @@ def plot_cpu_vs_ops(rapl_df, activity_df, output_dir):
     fig.savefig(os.path.join(output_dir, "cpu-vs-transactions.pdf"))
 
 
-def plot_power_per_transaction(rapl_df, activity_df, network_df, output_dir):
-    pue = 1.67
-
+def plot_power_per_transaction(rapl_df, activity_df, network_df, pue, output_dir):
     fig, ax = plt.subplots()
     # fig.figsize = (4, 6)
     fig.tight_layout(h_pad=3)
@@ -277,6 +273,7 @@ def plot_power_per_transaction(rapl_df, activity_df, network_df, output_dir):
     avgs["avg"] = activity_df["power"] / activity_df["txs_tot"]
     avgs["avg_op"] = activity_df["power"] / activity_df["ops"]
     avgs["avg_txs"] = activity_df["power"] / activity_df["txs"]
+    print("\n")
     print("Average per node: %.5f W" % avgs.mean()["avg"])
     print("Average per node (ops): %.5f W" % avgs.mean()["avg_op"])
     print("Average per node (ops): %.5f W" % avgs.mean()["avg_txs"])
@@ -334,18 +331,18 @@ def print_summary_table(rapl_df, network_df_raw, storage):
     rmu = rapl_df.mean()
     nmu = network_avg.mean()
     total = {
-        "q10": rq.at[0.1, "CPU"] + rq.at[0.1, "RAM"] + nq.at[0.1],
-        "mean": rmu["CPU"] + rmu["RAM"] + nmu + 6.5,
-        "q90": rq.at[0.9, "CPU"] + rq.at[0.9, "RAM"] + nq.at[0.9],
+        "q10": rq.at[0.1, "CPU"] + rq.at[0.1, "RAM"] + nq.at[0.1] + storage,
+        "mean": rmu["CPU"] + rmu["RAM"] + nmu + storage,
+        "q90": rq.at[0.9, "CPU"] + rq.at[0.9, "RAM"] + nq.at[0.9] + storage,
     }
 
-    cols = ["   ", "CPU", "RAM", "Network", "Storage", "Total"]
+    cols = [" " * 14, "CPU    ", "RAM", "Network", "Storage", "Total"]
     rows = [
-        "q10  & %.3f W & %.3f W & %.3f W & --- & %.3f"
+        "10~\\%% quantile & %.3f W & %.3f W & %.3f W & ---     & %.3f W"
         % (rq.at[0.1, "CPU"], rq.at[0.1, "RAM"], nq.at[0.1], total["q10"]),
-        "mean & %.3f W & %.3f W & %.3f W & %.3f & %.3f"
+        "Mean           & %.3f W & %.3f W & %.3f W & %.3f W & %.3f W"
         % (rmu["CPU"], rmu["RAM"], nmu, storage, total["mean"]),
-        "q10  & %.3f W & %.3f W & %.3f W & --- & %.3f"
+        "90~\\%% quantile & %.3f W & %.3f W & %.3f W & ---     & %.3f W"
         % (rq.at[0.9, "CPU"], rq.at[0.9, "RAM"], nq.at[0.9], total["q90"]),
     ]
 
@@ -388,6 +385,8 @@ def setup_mathplotlib():
 if __name__ == "__main__":
     setup_mathplotlib()
 
+    pue = 1.67
+
     parser = argparse.ArgumentParser(
         "Main plotting script. Make sure to configure the paths of \
         input-files inside the source-code."
@@ -409,11 +408,12 @@ if __name__ == "__main__":
     print_rapl_table(rapl_readings.copy())
     print_summary_table(rapl_readings.copy(), network_traffic_readings.copy(), 6.5)
 
-    plot_cpu_vs_ops(rapl_readings.copy(), ledger_readings.copy(), output_dir)
+    plot_cpu_vs_ops(rapl_readings.copy(), ledger_readings.copy(), pue, output_dir)
     plot_power_per_transaction(
         rapl_readings.copy(),
         ledger_readings.copy(),
         network_traffic_5m_readings.copy(),
+        pue,
         output_dir,
     )
     plot_rapl_readings(rapl_readings.copy(), output_dir)
