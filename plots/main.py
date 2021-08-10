@@ -87,16 +87,16 @@ Print LaTeX table for RAPL measurements
 def print_rapl_table(df):
     mu = df.mean()
     q = df.quantile([0.1, 0.9])
-    thead = "     & CPU  & RAM\\\\\\toprule\n"
+    thead = " " * 14 + " & CPU     & RAM\\\\\\toprule\n"
     tbody = ""
-    tbody += "q10  & %.3f W & %.3f W \\\\\n" % (q.at[0.1, "CPU"], q.at[0.1, "RAM"])
-    tbody += "mean & %.3f W & %.3f W \\\\\n" % (mu["CPU"], mu["RAM"])
-    tbody += "q90  & %.3f W & %.3f W \\\\\\bottomrule\n" % (
+    tbody += "10~\\%% quantile & %.3f W & %.3f W \\\\\n" % (q.at[0.1, "CPU"], q.at[0.1, "RAM"])
+    tbody += "Mean           & %.3f W & %.3f W \\\\\n" % (mu["CPU"], mu["RAM"])
+    tbody += "90~\\%% quantile & %.3f W & %.3f W \\\\\\bottomrule\n" % (
         q.at[0.9, "CPU"],
         q.at[0.9, "RAM"],
     )
 
-    print(thead + tbody)
+    print("\n" + thead + tbody + "\n")
 
 
 """
