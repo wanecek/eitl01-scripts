@@ -403,7 +403,7 @@ if __name__ == "__main__":
     sysstat_readings = read_csv(PATHS["TOP_STATS"])
     ledger_readings = read_csv(PATHS["LEDGER_ACTIVITY"])
 
-    output_dir = get_output_dir(sys.argv)
+    output_dir = get_output_dir(sys.argv[1])
 
     # Printing rapl table
     print_rapl_table(rapl_readings.copy())
