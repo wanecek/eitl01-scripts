@@ -8,6 +8,7 @@ from cycler import cycler
 import matplotlib.pyplot as plt
 import pandas as pd
 
+EXT = "pdf" # Change to png to export bitmaps instead
 DEFAULT_OUTPUT_DIR = "./figures"
 
 PATHS = {
@@ -56,7 +57,7 @@ def plot_network_traffic(network_df, output_dir, enddate="2021-06-01"):
 
     ax1.set_xlim([startdate, enddate])
 
-    fig.savefig(os.path.join(output_dir, "network-traffic.pdf"))
+    fig.savefig(os.path.join(output_dir, "network-traffic." + EXT))
 
 
 """
@@ -78,7 +79,7 @@ def plot_rapl_readings(df, output_dir):
         ax.set_xlim(["2021-05-14", "2021-06-01"])
 
     fig.tight_layout()
-    fig.savefig(os.path.join(output_dir, "rapl-readings.pdf"))
+    fig.savefig(os.path.join(output_dir, "rapl-readings." + EXT))
 
 
 """
@@ -139,7 +140,7 @@ def plot_rapl_with_others(rapl_df, sysstat_df, activity_df, network_df, output_d
         ax.set_xlim([startdate, enddate])
         ax.legend(bbox_to_anchor=(1, 1), loc="upper left", frameon=False, borderpad=0)
 
-    fig.savefig(os.path.join(output_dir, "rapl-vs-sysstat.pdf"))
+    fig.savefig(os.path.join(output_dir, "rapl-vs-sysstat." + EXT))
 
 
 def plot_cpu_vs_ops(rapl_df, activity_df, pue, output_dir):
@@ -197,7 +198,7 @@ def plot_cpu_vs_ops(rapl_df, activity_df, pue, output_dir):
     ax.set_xlabel("Transactions or operations per hour")
     fig.tight_layout()
 
-    fig.savefig(os.path.join(output_dir, "cpu-vs-transactions.pdf"))
+    fig.savefig(os.path.join(output_dir, "cpu-vs-transactions." + EXT))
 
 
 def plot_power_per_transaction(rapl_df, activity_df, network_df, pue, output_dir):
@@ -281,7 +282,7 @@ def plot_power_per_transaction(rapl_df, activity_df, network_df, pue, output_dir
     print("Average total (ops): %.3f W" % (n_nodes * avgs.mean()["avg_op"]))
     print("Average total (succ): %.3f W" % (n_nodes * avgs.mean()["avg_txs"]))
 
-    fig.savefig(os.path.join(output_dir, "power-vs-transactions.pdf"))
+    fig.savefig(os.path.join(output_dir, "power-vs-transactions." + EXT))
 
 
 def plot_piegraph(network_traffic, rapl, storage, output_dir):
@@ -319,7 +320,7 @@ def plot_piegraph(network_traffic, rapl, storage, output_dir):
     )
     ax.set_ylabel("")
 
-    fig.savefig(os.path.join(output_dir, "comparison-pie.pdf"))
+    fig.savefig(os.path.join(output_dir, "comparison-pie." + EXT))
 
 
 def print_summary_table(rapl_df, network_df_raw, storage):
